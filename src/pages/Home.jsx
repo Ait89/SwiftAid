@@ -9,7 +9,7 @@ export default function Home() {
       {/* Hero Section */}
       <div className="hero-section">
         <img
-          src="/src/assets/operation.jpg"
+          src="public\operation.jpg"
           alt="Operation Theatre"
           className="hero-image"
         />
