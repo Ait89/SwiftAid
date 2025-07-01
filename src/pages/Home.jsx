@@ -1,15 +1,14 @@
 import './Home.css';
 import { Link } from 'react-router-dom';
 import AmbulanceCards from '../components/AmbulanceCards';
-import AboutSection from '../components/AboutSection'; // Add the about section
+import AboutSection from '../components/AboutSection';
 
 export default function Home() {
   return (
     <div className="home">
-      {/* Hero Section */}
       <div className="hero-section">
         <img
-          src="public\operation.jpg"
+          src="/operation.jpg"
           alt="Operation Theatre"
           className="hero-image"
         />
@@ -23,7 +22,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* About Section */}
       <AboutSection />
     </div>
   );
