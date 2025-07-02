@@ -99,3 +99,20 @@
   color: inherit;
   display: block;
 }
+.auth-btn {
+  margin: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #ffffffcc;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.auth-btn:hover {
+  background-color: #fff;
+  color: #0066ff;
+  cursor: pointer;
+}
