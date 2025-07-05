@@ -1,6 +1,8 @@
-import { initializeApp } from "firebase/app";
+// src/firebase.js
+import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore } from "firebase/firestore";
+
 const firebaseConfig = {
   apiKey: "AIzaSyDwPHNMZVktaQ8y5IC60mPwLPv4BQlNHpQ",
   authDomain: "swiftaid-71922.firebaseapp.com",
@@ -9,6 +11,9 @@ const firebaseConfig = {
   messagingSenderId: "47498923075",
   appId: "1:47498923075:web:58f503bdf0674329f058f6"
 };
-const app = initializeApp(firebaseConfig);
+
+// ⚠️  initialize only once
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+export const db   = getFirestore(app);

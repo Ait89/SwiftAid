@@ -9,6 +9,8 @@ import BookAmbulance from './pages/BookAmbulance';
 import BookingHistory from './components/BookingHistory';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import AdminLogin from './admin/AdminLogin';
+import AdminDashboard from './admin/AdminDashboard';
 
 function App() {
   return (
@@ -23,6 +25,8 @@ function App() {
             <Route path="/history" element={<BookingHistory />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/admin-login" element={<AdminLogin />} />
+<Route path="/admin-dashboard" element={<AdminDashboard />} />
           </Routes>
         </main>
 

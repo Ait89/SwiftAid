@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import './BookAmbulance.css';
+import { addDoc, collection } from 'firebase/firestore';
+import { db, auth } from '../firebase';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 export default function BookAmbulance() {
   const [formData, setFormData] = useState({
@@ -11,34 +14,44 @@ export default function BookAmbulance() {
     type: 'BLS'
   });
 
+  const [user] = useAuthState(auth);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Fetch previous bookings (or empty array)
-    const previousBookings = JSON.parse(localStorage.getItem('bookings')) || [];
+    if (!user) {
+      alert('Please login to book an ambulance.');
+      return;
+    }
 
-    // Add current form data
-    const updatedBookings = [...previousBookings, formData];
+    try {
+      const bookingData = {
+        ...formData,
+        userId: user.uid,
+        createdAt: new Date().toISOString()
+      };
 
-    // Store in localStorage
-    localStorage.setItem('bookings', JSON.stringify(updatedBookings));
+      await addDoc(collection(db, 'bookings'), bookingData);
 
-    alert(`🚑 Ambulance booked successfully for ${formData.name}`);
+      alert(`🚑 Ambulance booked successfully for ${formData.name}`);
 
-    // Reset form
-    setFormData({
-      name: '',
-      phone: '',
-      location: '',
-      date: '',
-      time: '',
-      type: 'BLS'
-    });
+      setFormData({
+        name: '',
+        phone: '',
+        location: '',
+        date: '',
+        time: '',
+        type: 'BLS'
+      });
+    } catch (error) {
+      console.error('Error booking ambulance:', error);
+      alert('Something went wrong while booking.');
+    }
   };
 
   const handleEmergency = () => {

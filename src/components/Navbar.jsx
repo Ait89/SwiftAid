@@ -1,62 +1,63 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { useAuthState } from "react-firebase-hooks/auth";
 import "./Navbar.css";
 
 export default function Navbar() {
-  const [user, setUser] = useState(null);
+  const [user] = useAuthState(auth);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  const getInitials = (nameOrEmail) => {
-    if (!nameOrEmail) return "";
-    return nameOrEmail.slice(0, 2).toUpperCase();
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
   };
 
-  const handleLogout = () => {
-    signOut(auth)
-      .then(() => {
-        setUser(null);
-        setDropdownOpen(false);
-      })
-      .catch((error) => {
-        console.error("Error signing out:", error);
-      });
+  const logout = async () => {
+    await signOut(auth);
+    navigate("/");
   };
+
+  const userInitials = user?.displayName
+    ? user.displayName.slice(0, 2).toUpperCase()
+    : "";
 
   return (
     <nav className="navbar">
-      <h1>🚑SWIFTAID</h1>
+      <h1>🚑 SWIFTAID</h1>
       <div className="nav-links">
         <Link to="/">Home</Link>
         <Link to="/book">Book Ambulance</Link>
         <Link to="/history">Booking History</Link>
 
-        <div className="auth-icon" onClick={() => setDropdownOpen(!dropdownOpen)}>
-          {user ? (
-            <div className="user-initials">
-              {getInitials(user.displayName || user.email)}
-            </div>
+        {/* 👤 Auth Icon Section */}
+        <div className="avatar-container" onClick={toggleDropdown}>
+          {!user ? (
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png"
+              alt="user"
+              className="avatar"
+            />
           ) : (
-            <img src="/user-icon.jpg" alt="user" className="user-icon" />
+            <div className="avatar-initials">
+              {user.email === "admin@swiftaid.com" ? "🛠️" : userInitials}
+            </div>
           )}
-
           {dropdownOpen && (
-            <div className="auth-dropdown">
-              {user ? (
-                <button onClick={handleLogout} className="logout-btn">Logout</button>
-              ) : (
+            <div className="dropdown-menu">
+              {!user ? (
                 <>
                   <Link to="/login">Login</Link>
                   <Link to="/register">Register</Link>
                 </>
+              ) : user.email === "admin@swiftaid.com" ? (
+                <>
+                  <Link to="/admin-dashboard">Dashboard</Link>
+                  <button onClick={logout}>Logout</button>
+                </>
+              ) : (
+                <button onClick={logout}>Logout</button>
               )}
             </div>
           )}
