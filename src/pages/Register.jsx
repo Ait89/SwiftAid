@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth, db } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { doc, setDoc } from 'firebase/firestore';
-import { db } from '../firebase';
-import './Auth.css'; 
+import './Auth.css';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -15,6 +14,7 @@ export default function Register() {
     email: '',
     password: '',
     terms: false,
+    role: 'user', // default to user
   });
 
   const handleChange = (e) => {
@@ -49,10 +49,11 @@ export default function Register() {
         email: formData.email,
         phone: formData.phone,
         address: formData.address,
+        role: formData.role,
         createdAt: new Date().toISOString(),
       });
 
-      alert('Welcome to SWIFTAID, ' + formData.name + '!');
+      alert(`Welcome to SWIFTAID, ${formData.name}!`);
       navigate('/');
     } catch (error) {
       alert(error.message);
@@ -63,10 +64,11 @@ export default function Register() {
     <div className="auth-page">
       <form onSubmit={handleSubmit} className="auth-form">
         <h2>Create Account</h2>
+
         <input
           type="text"
           name="name"
-          placeholder="Full Name (e.g. Aditi Panigrahi)"
+          placeholder="Full Name"
           value={formData.name}
           onChange={handleChange}
           required
@@ -82,7 +84,7 @@ export default function Register() {
         <input
           type="text"
           name="address"
-          placeholder="Address (for emergencies)"
+          placeholder="Address"
           value={formData.address}
           onChange={handleChange}
           required
@@ -103,18 +105,25 @@ export default function Register() {
           onChange={handleChange}
           required
         />
-        <label style={{ fontSize: '0.9rem' }}>
+
+        {/* 🔽 Role Selector Dropdown */}
+        <select name="role" value={formData.role} onChange={handleChange} required>
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+
+        <label>
           <input
             type="checkbox"
             name="terms"
             checked={formData.terms}
             onChange={handleChange}
             required
-          />{' '}
+          />
           I agree to the{' '}
-          <span style={{ color: '#00e0ff' }}>Terms & Conditions</span> of
-          SWIFTAID.
+          <span style={{ color: '#00e0ff' }}>Terms & Conditions</span> of SWIFTAID.
         </label>
+
         <button type="submit">Register</button>
       </form>
     </div>
