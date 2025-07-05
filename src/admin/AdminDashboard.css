@@ -80,6 +80,7 @@ table {
   background-color: #fff;
   border-radius: 10px;
   overflow: hidden;
+  
 }
 
 thead {
@@ -226,4 +227,61 @@ button.delete {
   padding: 2rem;
   background-color: #f8fafc;
   overflow-y: auto;
+}
+.table-section {
+  margin-top: 2rem;
+}
+
+.table-scroll {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+
+}
+
+.table-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+
+.table-scroll th{
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid #e8e1e1;
+  text-align: left;
+  background-color: #d90429;
+  color: #222;
+}
+.table-scroll td {
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.table-scroll th {
+  position: sticky;
+  top: 0;
+  background-color: #f9f9f9;
+  z-index: 1;
+}
+
+.table-scroll tr:hover {
+  background-color: #f0f0f0;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin: 0 4px;
+  font-size: 1rem;
+}
+
+.action-btn.edit:hover {
+  color: #0066cc;
+}
+
+.action-btn.delete:hover {
+  color: red;
 }
