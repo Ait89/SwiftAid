@@ -80,3 +80,24 @@
   background-color: #cc002a;
   transform: scale(1.05);
 }
+/* Prevent Leaflet controls from overlapping navbar */
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 400; /* less than navbar (usually 500+ in most frameworks) */
+}
+
+/* Optional: adjust position of zoom buttons */
+.leaflet-top.leaflet-left {
+  top: 60px; /* Push below navbar */
+  left: 10px;
+}
+
+/* Optional: adjust attribution */
+.leaflet-control-attribution {
+  bottom: 5px;
+  right: 5px;
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 2px 5px;
+  border-radius: 4px;
+}

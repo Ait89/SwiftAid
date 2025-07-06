@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { auth, db } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -24,6 +25,7 @@ export default function AdminDashboard() {
 
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
+  const [activeView, setActiveView] = useState("bookings");
 
   useEffect(() => {
     const checkRoleAndListen = async () => {
@@ -76,7 +78,7 @@ export default function AdminDashboard() {
     setEditForm({
       name: booking.name,
       phone: booking.phone,
-      location: booking.location,
+      address: booking.address,
       date: booking.date,
       time: booking.time,
       type: booking.type
@@ -98,103 +100,176 @@ export default function AdminDashboard() {
       <h2>Welcome, Admin 👩‍⚕️</h2>
 
       <div className="stats-grid">
-        <div className="stat-card">
-          <h3>{filteredBookings.length}</h3>
+        <div className="stat-card" onClick={() => setActiveView("bookings")}>
+          <h3>{bookings.length}</h3>
           <p>Total Bookings</p>
         </div>
-        <div className="stat-card">
+        <div className="stat-card" onClick={() => setActiveView("users")}>
           <h3>{users.length}</h3>
           <p>Total Users</p>
         </div>
-        <div className="stat-card">
+        <div className="stat-card" onClick={() => setActiveView("BLS")}>
           <h3>BLS</h3>
           <p>{bookings.filter(b => b.type === 'BLS').length} Bookings</p>
         </div>
-        <div className="stat-card">
+        <div className="stat-card" onClick={() => setActiveView("ALS")}>
           <h3>ALS</h3>
           <p>{bookings.filter(b => b.type === 'ALS').length} Bookings</p>
         </div>
-        <div className="stat-card">
+        <div className="stat-card" onClick={() => setActiveView("ICU")}>
           <h3>ICU</h3>
           <p>{bookings.filter(b => b.type === 'ICU').length} Bookings</p>
         </div>
       </div>
 
-      <div className="filters">
-        <input
-          type="text"
-          placeholder="Search by name or phone"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      {activeView === "bookings" && (
+        <>
+          <div className="filters">
+            <input
+              type="text"
+              placeholder="Search by name or phone"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
+              <option value="">All Types</option>
+              <option value="BLS">BLS</option>
+              <option value="ALS">ALS</option>
+              <option value="ICU">ICU</option>
+            </select>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+          </div>
 
-        <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
-          <option value="">All Types</option>
-          <option value="BLS">BLS</option>
-          <option value="ALS">ALS</option>
-          <option value="ICU">ICU</option>
-        </select>
+          <div className="table-section">
+            <h3>Total Bookings</h3>
+            <div className="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Type</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredBookings.map((b) => (
+                    <tr key={b.id}>
+                      {editingId === b.id ? (
+                        <>
+                          <td><input name="name" value={editForm.name} onChange={handleEditChange} /></td>
+                          <td><input name="phone" value={editForm.phone} onChange={handleEditChange} /></td>
+                          <td><input name="address" value={editForm.address} onChange={handleEditChange} /></td>
+                          <td><input name="date" type="date" value={editForm.date} onChange={handleEditChange} /></td>
+                          <td><input name="time" value={editForm.time} onChange={handleEditChange} /></td>
+                          <td>
+                            <select name="type" value={editForm.type} onChange={handleEditChange}>
+                              <option value="BLS">BLS</option>
+                              <option value="ALS">ALS</option>
+                              <option value="ICU">ICU</option>
+                            </select>
+                          </td>
+                          <td>
+                            <button className="action-btn save" onClick={() => handleEditSave(b.id)}>💾</button>
+                            <button className="action-btn cancel" onClick={() => setEditingId(null)}>❌</button>
+                          </td>
+                        </>
+                      ) : (
+                        <>
+                          <td>{b.name}</td>
+                          <td>{b.phone}</td>
+                          <td>{b.address}</td>
+                          <td>{b.date}</td>
+                          <td>{b.time}</td>
+                          <td>{b.type}</td>
+                          <td>
+                            <button className="action-btn edit" onClick={() => handleEdit(b)}>✏️</button>
+                            <button className="action-btn delete" onClick={() => handleDelete(b.id)}>🗑️</button>
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
 
-        <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-      </div>
-
-      <div className="table-section">
-        <h3>Total Bookings</h3>
-        <div className="table-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Location</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Type</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredBookings.map((b) => (
-                <tr key={b.id}>
-                  {editingId === b.id ? (
-                    <>
-                      <td><input name="name" value={editForm.name} onChange={handleEditChange} /></td>
-                      <td><input name="phone" value={editForm.phone} onChange={handleEditChange} /></td>
-                      <td><input name="location" value={editForm.location} onChange={handleEditChange} /></td>
-                      <td><input name="date" type="date" value={editForm.date} onChange={handleEditChange} /></td>
-                      <td><input name="time" value={editForm.time} onChange={handleEditChange} /></td>
-                      <td>
-                        <select name="type" value={editForm.type} onChange={handleEditChange}>
-                          <option value="BLS">BLS</option>
-                          <option value="ALS">ALS</option>
-                          <option value="ICU">ICU</option>
-                        </select>
-                      </td>
-                      <td>
-                        <button className="action-btn save" onClick={() => handleEditSave(b.id)}>💾</button>
-                        <button className="action-btn cancel" onClick={() => setEditingId(null)}>❌</button>
-                      </td>
-                    </>
-                  ) : (
-                    <>
-                      <td>{b.name}</td>
-                      <td>{b.phone}</td>
-                      <td>{b.location}</td>
-                      <td>{b.date}</td>
-                      <td>{b.time}</td>
-                      <td>{b.type}</td>
-                      <td>
-                        <button className="action-btn edit" onClick={() => handleEdit(b)}>✏️</button>
-                        <button className="action-btn delete" onClick={() => handleDelete(b.id)}>🗑️</button>
-                      </td>
-                    </>
-                  )}
+      {["BLS", "ALS", "ICU"].includes(activeView) && (
+        <div className="table-section">
+          <h3>{activeView} Bookings</h3>
+          <div className="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Address</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Type</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {bookings.filter(b => b.type === activeView).map(b => (
+                  <tr key={b.id}>
+                    <td>{b.name}</td>
+                    <td>{b.phone}</td>
+                    <td>{b.address}</td>
+                    <td>{b.date}</td>
+                    <td>{b.time}</td>
+                    <td>{b.type}</td>
+                    <td>
+                      <button className="action-btn edit" onClick={() => handleEdit(b)}>✏️</button>
+                      <button className="action-btn delete" onClick={() => handleDelete(b.id)}>🗑️</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
+
+      {activeView === "users" && (
+        <div className="table-section">
+          <h3>All Users</h3>
+          <div className="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Address</th>
+                  <th>Role</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map(u => (
+                  <tr key={u.id}>
+                    <td>{u.name}</td>
+                    <td>{u.email}</td>
+                    <td>{u.phone}</td>
+                    <td>{u.address}</td>
+                    <td>{u.role}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

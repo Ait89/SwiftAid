@@ -43,6 +43,12 @@
   font-size: 0.9rem;
 }
 
+.stat-card:hover {
+  transform: scale(1.03);
+  border-left-color: #007bff;
+}
+
+
 /* Filters between stat cards and table */
 .filters {
   display: flex;
@@ -71,6 +77,7 @@
   text-align: center;
   margin-bottom: 1rem;
   color: #222;
+ 
 }
 
 table {

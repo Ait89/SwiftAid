@@ -3,15 +3,16 @@ import './BookAmbulance.css';
 import { addDoc, collection } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import LocationMap from '../LocationMap'; // Adjust if needed
 
 export default function BookAmbulance() {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
-    location: '',
+    address: '',
     date: '',
     time: '',
-    type: 'BLS'
+    type: 'BLS',
   });
 
   const [user] = useAuthState(auth);
@@ -33,7 +34,7 @@ export default function BookAmbulance() {
       const bookingData = {
         ...formData,
         userId: user.uid,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       };
 
       await addDoc(collection(db, 'bookings'), bookingData);
@@ -43,10 +44,10 @@ export default function BookAmbulance() {
       setFormData({
         name: '',
         phone: '',
-        location: '',
+        address: '',
         date: '',
         time: '',
-        type: 'BLS'
+        type: 'BLS',
       });
     } catch (error) {
       console.error('Error booking ambulance:', error);
@@ -79,7 +80,7 @@ export default function BookAmbulance() {
           <input
             type="tel"
             name="phone"
-            placeholder="Your Phone Number"
+            placeholder="Phone Number"
             value={formData.phone}
             onChange={handleChange}
             required
@@ -87,16 +88,19 @@ export default function BookAmbulance() {
         </label>
 
         <label>
-          Pickup Location:
+          Pickup Address:
           <input
             type="text"
-            name="location"
-            placeholder="Address or Landmark"
-            value={formData.location}
+            name="address"
+            placeholder="Full address or landmark"
+            value={formData.address}
             onChange={handleChange}
             required
           />
         </label>
+
+        {/* Static map (Kolkata centered) */}
+        <LocationMap />
 
         <label>
           Date:
@@ -122,11 +126,7 @@ export default function BookAmbulance() {
 
         <label>
           Ambulance Type:
-          <select
-            name="type"
-            value={formData.type}
-            onChange={handleChange}
-          >
+          <select name="type" value={formData.type} onChange={handleChange}>
             <option value="BLS">Basic Life Support (BLS)</option>
             <option value="ALS">Advanced Life Support (ALS)</option>
             <option value="ICU">ICU Ambulance</option>
